@@ -35,6 +35,6 @@ The file *"plate reader output template.xlsx"* shows how you should provide the 
 
 **For more information:**
 
-https://stats.stackexchange.com/questions/61144/how-to-do-4-parametric-regression-for-elisa-data-in-r
-http://weightinginbayesianmodels.github.io/poctcalibration/calib_tut4_curve_ocon.html
-https://www.myassays.com/four-parameter-logistic-regression.html
++ https://stats.stackexchange.com/questions/61144/how-to-do-4-parametric-regression-for-elisa-data-in-r
++ http://weightinginbayesianmodels.github.io/poctcalibration/calib_tut4_curve_ocon.html
++ https://www.myassays.com/four-parameter-logistic-regression.html
