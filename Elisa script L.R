@@ -15,12 +15,18 @@ location=dlg_open("~/Home/",title = "Please select your file")$res
 colnames(df)=NULL
 
 output=dlg_dir("~/Home/", caption = "Please select output directory")$res
-plot_list=list()
-data_list=list()
 out_of_bounds=dlg_input(message = "Do you want to allow out of bound values? Yes/No", default = "No")$res
 out_of_bounds=out_of_bounds=="No"
 how_many=round(nrow(df)/10,digits = 0)
 experiment=dlg_input(message = "Please name your experiment", default = "experiment")$res
+same_same=dlg_input(message = "Are all the plates same? (format/standard)", default = "No")$res
+if (same_same !="No"){
+  STD=dlg_input(message = paste0("STD for all plates starts at (pg/ml)"), default = "1000")$res
+  STD_Position=dlg_input(message = paste0("STD position for all plates is vertical/horizontal?"), default = "horizontal")$res
+  STD=as.numeric(STD)}
+
+plot_list=list()
+data_list=list()
 
 for (i in 1:how_many){
   (from=as.numeric(paste0(i-1,2)))
@@ -35,9 +41,11 @@ for (i in 1:how_many){
   (dilutions$row=LETTERS[1:8])
   dilutions
   
-  STD=dlg_input(message = paste0("STD for plate ",i," starts at (pg/ml)"), default = "1000")$res
-  STD_Position=dlg_input(message = paste0("STD position for plate ",i ," is vertical/horizontal?"), default = "horizontal")$res
-  STD=as.numeric(STD)
+  if (same_same =="No"){
+    STD=dlg_input(message = paste0("STD for plate ",i," starts at (pg/ml)"), default = "1000")$res
+    STD_Position=dlg_input(message = paste0("STD position for plate ",i ," is vertical/horizontal?"), default = "horizontal")$res
+    STD=as.numeric(STD)
+  }
   
   samples = data
   samples

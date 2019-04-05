@@ -15,18 +15,18 @@ location=dlg_open("~/Home/",title = "Please select your file")$res
 colnames(df)=NULL
 
 output=dlg_dir("~/Home/", caption = "Please select output directory")$res
-plot_list=list()
-data_list=list()
 out_of_bounds=dlg_input(message = "Do you want to allow out of bound values? Yes/No", default = "No")$res
 out_of_bounds=out_of_bounds=="No"
 how_many=round(nrow(df)/10,digits = 0)
 experiment=dlg_input(message = "Please name your experiment", default = "experiment")$res
 same_same=dlg_input(message = "Are all the plates same? (format/standard)", default = "No")$res
-
 if (same_same !="No"){
   STD=dlg_input(message = paste0("STD for all plates starts at (pg/ml)"), default = "2000")$res
   STD_Position=dlg_input(message = paste0("STD position for all plates is vertical/horizontal?"), default = "vertical")$res
   STD=as.numeric(STD)}
+
+plot_list=list()
+data_list=list()
 
 for (i in 1:how_many){
   (from=as.numeric(paste0(i-1,2)))
@@ -107,7 +107,6 @@ for (i in 1:how_many){
     ggtitle(paste0("Standard Curve of ",experiment,", plate ",i))+
     xlab("Conc [pg/mL]")+ylab("OD")+
     geom_step(data = line,aes(color="red"))+theme_classic()+theme(legend.position="none")
-  
   
   my_plate$conc <- fit$coefficients[4]*(((-1*fit$coefficients[3]+my_plate$blanked)/( fit$coefficients[2]-my_plate$blanked))^(1/ fit$coefficients[1]))
   
