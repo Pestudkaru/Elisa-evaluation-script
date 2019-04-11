@@ -19,6 +19,7 @@ out_of_bounds=dlg_input(message = "Do you want to allow out of bound values? Yes
 out_of_bounds=out_of_bounds=="No"
 how_many=round(nrow(df)/10,digits = 0)
 experiment=dlg_input(message = "Please name your experiment", default = "experiment")$res
+# are all the plates the same or different in regards to STD
 same_same=dlg_input(message = "Are all the plates same? (format/standard)", default = "No")$res
 if (same_same !="No"){
   STD=dlg_input(message = paste0("STD for all plates starts at (pg/ml)"), default = "1000")$res
@@ -86,28 +87,50 @@ for (i in 1:how_many){
   if (STD_Position =="horizontal"){
     my_standard <- data.frame(OD1=my_plate$blanked[73:80],OD2= my_plate$blanked [85:92])
     my_standard$mean_OD <- rowMeans(my_standard)  
-    my_standard$mean_OD[my_standard$mean_OD<0]=0
   }else{
     my_standard <- data.frame(OD1=my_plate$blanked[c(1, 13, 25, 37, 49, 61, 73, 85)],OD2= my_plate$blanked [c(2, 14, 26, 38, 50, 62, 74, 86)])
     my_standard$mean_OD <- rowMeans(my_standard)
-    my_standard$mean_OD[my_standard$mean_OD<0]=0
   }
   
   my_standard$Conc=c(STD,STD/2,STD/4,STD/8,STD/16,STD/32,STD/64, 0)
   my_standard
   
-  my_plate
+  # if for some reason the STD is all wrong and only zeros appear this part will create a "fake" curve so that it won't break the loop
+  # this really should not happen tho as the standard at the very least should work.
+  # DRC cannot handle negative numbers 
+  my_standard$mean_OD[my_standard$mean_OD<0]=0
+  # nor can it handle all zeros - look up
+  if (sum(my_standard$mean_OD)==0) {
+    my_standard$mean_OD=c(1,rep(0,(length(my_standard$mean_OD)-1)))
+  }
+  
+  my_standard
   
   fit<-drm(formula = mean_OD ~ Conc, data = my_standard, fct = LL.4())
+  # Checking the quality of the STD
+  somethings_wrong=FALSE
+  if ((sum(my_standard$mean_OD==0)>2)|noEffect(fit)[3]>0.01) {
+    somethings_wrong=TRUE
+  }else{
+    somethings_wrong=FALSE
+  }
+  # Doing the plotting
   x <- seq(0,STD, length=1000)
   y <- (fit$coefficients[2]+ (fit$coefficients[3]- fit$coefficients[2])/(1+(x/fit$coefficients[4])^ fit$coefficients[1]))
   line=data.frame(Conc=x,mean_OD=y)
   
-  plot_list[[i]]=ggplot(my_standard, aes(Conc,mean_OD))+geom_point()+
-    ggtitle(paste0("Standard Curve of ",experiment,", plate ",i))+
+  text=paste0("Standard Curve of ",experiment,", plate ",i," \n ",ex_name)
+  p=ggplot(my_standard, aes(Conc,mean_OD))+geom_point()+
+    ggtitle(text)+
     xlab("Conc [pg/mL]")+ylab("OD")+
     geom_step(data = line,aes(color="red"))+theme_classic()+theme(legend.position="none")
   
+  if (somethings_wrong==TRUE) {
+    p=p + annotate(geom="text", x=((max(my_standard$Conc)+min(my_standard$Conc))/2), y=((max(my_standard$mean_OD)+min(my_standard$mean_OD))/2), label="Something is wrong with your standard!!!",
+                   fontface="bold",color="red")
+  }
+  
+  plot_list[[i]]=p
   
   my_plate$conc <- fit$coefficients[4]*(((-1*fit$coefficients[3]+my_plate$blanked)/( fit$coefficients[2]-my_plate$blanked))^(1/ fit$coefficients[1]))
   
@@ -159,6 +182,6 @@ for (i in 1:how_many){
   # WriteXLS(data_out,paste0(output,"/",experiment,", plate ",i," out",".xls"),row.names = T)
 }
 
-do.call(plot_grid,plot_list)+ggsave(paste0(output,"/",experiment,"_curve",".pdf"))
+do.call(plot_grid,plot_list)+ggsave(paste0(output,"/",experiment,"_curve",".pdf"),scale = 3)
 (data_out_final=do.call(rbind,data_list))
 WriteXLS(data_out_final,paste0(output,"/",experiment," Elisa evaluation",".xls"),row.names = F,col.names = F)

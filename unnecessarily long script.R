@@ -19,7 +19,6 @@ out_of_bounds=dlg_input(message = "Do you want to allow out of bound values? Yes
 out_of_bounds=out_of_bounds=="No"
 how_many=round(nrow(df)/10,digits = 0)
 experiment=dlg_input(message = "Please name your experiment", default = "experiment")$res
-# are all the plates the same or different in regards to STD
 same_same=dlg_input(message = "Are all the plates same? (format/standard)", default = "No")$res
 if (same_same !="No"){
   STD=dlg_input(message = paste0("STD for all plates starts at (pg/ml)"), default = "2000")$res
@@ -87,34 +86,33 @@ for (i in 1:how_many){
   if (STD_Position =="vertical"){
     my_standard <- data.frame(OD1=my_plate$blanked[c(11, 23, 35, 47, 59, 71, 83, 95)],OD2= my_plate$blanked [c(12, 24, 36, 48, 60, 72, 84, 96)])
     my_standard$mean_OD <- rowMeans(my_standard)
+    my_standard$mean_OD[my_standard$mean_OD<0]=0
   }else{
     my_standard <- data.frame(OD1=my_plate$blanked[73:80],OD2= my_plate$blanked [85:92])
     my_standard$mean_OD <- rowMeans(my_standard)  
+    my_standard$mean_OD[my_standard$mean_OD<0]=0
   }
-  
   my_standard$Conc=c(STD,STD/2,STD/4,STD/8,STD/16,STD/32,STD/64, 0)
   my_standard
   
-  # if for some reason the STD is all wrong and only zeros appear this part will create a "fake" curve so that it won't break the loop
+  # if for some reason the STD is all wrong and only zeros appear this part will create a "fake" curve so that it wont break the loop
   # this really should not happen tho as the standard at the very least should work.
-  # DRC cannot handle negative numbers 
-  my_standard$mean_OD[my_standard$mean_OD<0]=0
-  # nor can it handle all zeros - look up
+  somethings_wrong=FALSE
   if (sum(my_standard$mean_OD)==0) {
+    somethings_wrong=TRUE
     my_standard$mean_OD=c(1,rep(0,(length(my_standard$mean_OD)-1)))
   }
   
   my_standard
   
   fit<-drm(formula = mean_OD ~ Conc, data = my_standard, fct = LL.4())
-  # Checking the quality of the STD
-  somethings_wrong=FALSE
-  if ((sum(my_standard$mean_OD==0)>2)|noEffect(fit)[3]>0.01) {
+  
+  if ((noEffect(fit)[3]>0.01|somethings_wrong==TRUE)) {
     somethings_wrong=TRUE
   }else{
     somethings_wrong=FALSE
   }
-  # Doing the plotting
+
   x <- seq(0,STD, length=1000)
   y <- (fit$coefficients[2]+ (fit$coefficients[3]- fit$coefficients[2])/(1+(x/fit$coefficients[4])^ fit$coefficients[1]))
   line=data.frame(Conc=x,mean_OD=y)
