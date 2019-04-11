@@ -1,10 +1,14 @@
 # Elisa-evaluation-script
 
-Latest update: 29.03.2019 
+**Latest update: 11.04.2019**
 
-Another dialog box asking if all the standards and locations are the same you only have to input it once. 
+Fixed some problems with the curve calculations. Now even if one plate/STD is messed up it wont break the loop. Also the script will lable standards with a warning when it detects a possible problem. Plate names will be added to the curve plots.
 
-Elisa script.R is the regular version and Elisa script L.R is for special people! ^_^ Just download which ever version you want. Also the template file is here for reference.  
+**Update: 29.03.2019**
+
+Another dialog box asking if all the standards and locations are the same, if so then you'll only have to input once. 
+
+Elisa script.R is the regular version and Elisa script L.R is for special people! ^_^ Just download whichever version you want. Also the template file is here for reference.  
 
 ## A little about the script:
 
