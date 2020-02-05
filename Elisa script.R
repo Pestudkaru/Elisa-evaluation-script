@@ -95,6 +95,14 @@ for (i in 1:how_many){
   my_standard$Conc=c(STD,STD/2,STD/4,STD/8,STD/16,STD/32,STD/64, 0)
   my_standard
   
+  if (sum(is.na(my_standard))>0) {
+    nanas=which(is.na(my_standard$mean_OD))
+    my_standard[is.na(my_standard)]=0
+    sums=my_standard$OD1+my_standard$OD2
+    my_standard$mean_OD[nanas]=sums[nanas]
+    my_standard  
+  }
+  
   # if for some reason the STD is all wrong and only zeros appear this part will create a "fake" curve so that it won't break the loop
   # this really should not happen tho as the standard at the very least should work.
   # DRC cannot handle negative numbers 
