@@ -1,6 +1,6 @@
 # Elisa-evaluation-script
 **Latest update: 11.02.2020**
-Fixed some standard issues. If one of the values is missing the program will just use the remaining one value as is. 
+Fixed some issues with standard. If one of the values is missing the program will just use the remaining one value as is. 
 
 **Also to install packages run the following command:**
 
