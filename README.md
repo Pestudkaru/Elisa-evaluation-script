@@ -1,4 +1,12 @@
 # Elisa-evaluation-script
+**Latest update: 11.02.2020**
+Fixed some standard issues. If one of the values is missing the program will just use the remaining one value as is. 
+
+**Also to install packages run the following command:**
+
+pkgs2instll=c("tidyr","gtools","WriteXLS","drc","svDialogs","ggplot2","cowplot","readxl")
+install.packages(pkgs2instll,dependencies = T)
+
 
 **Latest update: 11.04.2019**
 
