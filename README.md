@@ -18,7 +18,7 @@ Another dialog box asking if all the standards and locations are the same, if so
 
 Elisa script.R is the regular version and Elisa script L.R is for special people! ^_^ Just download whichever version you want. Also the template file is here for reference.  
 
-## A little about the script:
+## A little info about the script:
 
 The script uses an R package called DRC or Dose-Response Curves from Ritz et al. 
 It builds a Four Parameter Logistic (4PL) Regression model based on your standard (STD) using the following equation:
